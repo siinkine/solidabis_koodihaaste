@@ -1,0 +1,142 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+
+<div class="container", style="width:900px;height:500px;">
+
+    <h2>Tulokset</h2>
+    <p><b> Käytetty aika ja polttoaine</b></p>
+    
+    <div>
+        <ul class="list-group">
+            {% for re in res %}
+            <li class="list-group-item"> Tilanne {{re.c}}: Nopeus: {{re.velocity}} km/h,
+                 Polttoainekulutus: {{re.consumption}}  litraa ja käytetty aika: {{re.time}} tuntia </li>
+            {% endfor %}
+      </ul>
+    </div>
+<br></br>
+<p> <b> Vertailut: </b></p>
+<p> Polttoaineenkulutus: Tilanne {{diffs.Y}} vei  kulutukseltaan {{diffs.consumption}}({{diffs.con_p}}) litraa(%) vähemmän polttoainetta verrattuna tilanteeseen {{diffs.X}}.  </p>
+<p> Matka-aika: Tilanne {{diffs.Y}} vei  matka-ajaltaan {{diffs.time}}({{diffs.time_p}}) tuntia(%) enemmän verrattuna tilanteeseen {{diffs.X}}. </p>
+
+<form action="{{ url_for("gfg")}}" method="get">    
+    <button type="submit", class="btn btn-dark"> Laske uudelleen </button>
+     
+<div id="myDiv", style="width:900px;height:500px;">
+</div>
+
+</div>  
+
+
+<script>
+    var e4 = {{prices|safe}};
+    var petrol_type = Object.keys(e4);
+    var petrol_val = []
+    var i;
+    for (i = 0; i < petrol_type.length; i++) {
+        petrol_val[i] =  e4[petrol_type[i]];
+    }
+
+
+    var a = {{res|safe}}
+    var tilanne_0 = a[0]
+    var tilanne_1 = a[1]
+
+
+var data = [
+  {
+    x: ['Tilanne 0', 'Tilanne 1'],
+    y: [tilanne_0['consumption']*petrol_val[0], tilanne_1['consumption']*petrol_val[0]],
+    type: 'bar',
+    marker: {color: '#588BD6'},
+    name: petrol_type[0]
+
+  },
+  {
+    x: ['Tilanne 0', 'Tilanne 1'],
+    y: [tilanne_0['consumption']*petrol_val[1], tilanne_1['consumption']*petrol_val[1]],
+    type: 'bar',
+    marker: {color: '#F06A6A'},
+    visible: false,
+    name: petrol_type[1]
+
+  },
+
+  {
+    x: ['Tilanne 0', 'Tilanne 1'],
+    y: [tilanne_0['consumption']*petrol_val[2], tilanne_1['consumption']*petrol_val[2]],
+    type: 'bar',
+    marker: {color: '#58D68D'},
+    visible: false,
+    name: petrol_type[2]
+
+  },
+
+
+];
+
+
+var button_layer_2_height = 1.2
+var updatemenus=[
+    {
+        buttons: [
+            {
+                args: [{'visible': [true, false, false]},
+                       {'title': petrol_type[0]}],
+                label: petrol_type[0],
+                method: 'update'
+            },
+            {
+                args: [{'visible': [false,  true, false]},
+                       {'title': petrol_type[1]}],
+                label: petrol_type[1],
+                method: 'update'
+            },
+            {
+                args: [{'visible': [ false, false, true,]},
+                       {'title': petrol_type[2]}],
+                label: petrol_type[2],
+                method: 'update'
+            },
+            {
+                args: [{'visible': [ true, true, true,]},
+                       {'title': 'Kaikki'}],
+                label: 'Kaikki',
+                method: 'update'
+            },
+
+
+        ],
+        direction: 'left',
+        pad: {'r': 10, 't': 10},
+        showactive: true,
+        type: 'buttons',
+        x: 0.1,
+        xanchor: 'left',
+        y: button_layer_2_height,
+        yanchor: 'top'
+    },
+
+]
+
+var layout = {
+    title: petrol_type[0],
+    yaxis: {
+    title: {
+      text: 'Kulutus (€)',
+      font: {
+        size: 18,
+        color: '#7f7f7f'
+      }}},
+    updatemenus: updatemenus,
+    showlegend: false
+}
+
+
+Plotly.newPlot('myDiv', data, layout);
+
+</script>    
+
+
+{% endblock %}
